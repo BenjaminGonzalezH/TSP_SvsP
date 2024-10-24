@@ -30,7 +30,8 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'Libraries'))
 from ReadTSP import ReadTsp # type: ignore
 from ReadTSP import ReadTSP_optTour # type: ignore
 from TabuSearch import ObjFun  # type: ignore
-from MemeticAlgorithm import memetic_algorithm # type: ignore
+from TabuSearch import TabuSearch  # type: ignore
+from GeneticAlgorithm import genetic_algorithm # type: ignore
 
 ########## Secundary functions ##########
 def Read_Content(filenames_Ins, filenames_Opt):
@@ -72,20 +73,23 @@ results = []
 start_time = time.time()
 #for Instance, opt_value in zip(Instances, Opt_Instances):
 # Llamar a GLS (o TabuSearch) utilizando los mejores parámetros cargados.
-result = memetic_algorithm(Instances[1], len(Instances[1]), pop_size=50, MaxOFcalls=8000)
-        
+#result = genetic_algorithm(Instances[1], len(Instances[1]), pop_size=50, MaxOFcalls=8000)
+result1 = TabuSearch(Instances[1], len(Instances[1]), MaxOFcalls=8000, TabuSize=10,
+               minErrorInten=0.001)
+#print(result)
+print(ObjFun(result1,Instances[1]))       
 # Calcular el valor de la función objetivo para la solución obtenida
-obj_value = ObjFun(result, Instances[1])
+#obj_value = ObjFun(result, Instances[1])
 
 # Calcular el error respecto al valor óptimo
-error = (obj_value - Opt_Instances[1]) / Opt_Instances[1]
+#error = (obj_value - Opt_Instances[1]) / Opt_Instances[1]
         
 # Guardar el resultado y el error
-results.append((obj_value, error))
+#results.append((obj_value, error))
 
 end_time = time.time()
         
 # Imprimir el valor de la función objetivo para la solución obtenida.
-print(f"Objective Value: {obj_value}, Error: {error}")
+#print(f"Objective Value: {obj_value}, Error: {error}")
 execution_time = end_time - start_time
 print(f"Tiempo de ejecución: {execution_time} segundos")
