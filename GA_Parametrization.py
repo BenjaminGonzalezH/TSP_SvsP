@@ -1,5 +1,6 @@
 ########## Libraries ##########
 import sys
+import numpy as np
 import os
 import optuna
 import json
@@ -21,16 +22,14 @@ import time
 Path_Instances = "Instances/Parametrizacion"
 Path_OPT = "Optimals/Parametrizacion/Optimals.txt"
 output_directory = 'Results/Parametrization'
-best_MA_params_file = 'best_MA_params.txt'
-trials_MA_file = 'trials_MA.csv'
+best_GA_params_file = 'best_GA_params.txt'
+trials_GA_file = 'trials_GA.csv'
 
 ########## Own files ##########
 # Path from the workspace.
 sys.path.append(os.path.join(os.path.dirname(__file__), 'Libraries'))
 from ReadTSP import ReadTsp # type: ignore
 from ReadTSP import ReadTSP_optTour # type: ignore
-from TabuSearch import ObjFun  # type: ignore
-from TabuSearch import TabuSearch  # type: ignore
 from GeneticAlgorithm import genetic_algorithm # type: ignore
 
 ########## Secundary functions ##########
@@ -54,6 +53,86 @@ def Read_Content(filenames_Ins, filenames_Opt):
 
     return Instances, OPT_Instances
 
+def Parametrization_GA(trial, Instances, Opt_Instances):
+    """
+    Parametrization_TS (Function)
+        Input: trial (parameters for evaluation) and
+        list of distance matrices (one per instance).
+        Output: Best trial of parameters.
+        Description: Perform the parameterization procedure with
+        every trial.
+    """
+    # Define parameter intervals using Optuna's suggest methods.
+    MaxOFcalls = trial.suggest_int('MaxOFcalls', 600, 8000)  # Control for max calls
+    pop_size = trial.suggest_int('POP_SIZE', 10, 750)
+
+    # Initialize total normalized error.
+    total_normalized_error = 0
+    num_instances = len(Instances)
+
+    for i in range(num_instances):
+        # Run Tabu Search with the parameters from Optuna
+        population, _ = genetic_algorithm(Instances[i], len(Instances[i]), 
+                                          pop_size,
+                                          MaxOFcalls)
+
+        # Evaluate the solution quality and calculate normalized error
+        nor_error_list = []
+        for solution in population:
+            normalized_error = abs(solution[1] - Opt_Instances[i]) / Opt_Instances[i]
+            nor_error_list.append(normalized_error)
+        median_error = np.median(nor_error_list)
+
+        # Sum the normalized error
+        total_normalized_error += median_error
+
+    # Return the average normalized error across all instances
+    return total_normalized_error / num_instances
+
+def Parametrization_GA_capsule(Instances, Opt_Instances):
+    """
+    Parametrization_capsule (Function)
+        Encapsulates other inputs from the main
+        parameterization function for optimization purposes.
+    """
+    return lambda trial: Parametrization_GA(trial, Instances, Opt_Instances)
+
+def save_GA_study_txt(study, output_dir, best_params_file, trials_file):
+    """
+        save_TS_study_txt (function)
+            Input: 
+                - study: Optuna study object for Tabu Search.
+                - output_dir: Directory where the files will be saved.
+                - best_params_file: Filename for the best parameters.
+                - trials_file: Filename for the trials data.
+            Description:
+                Saves the best parameters and trials of a Tabu Search Optuna study
+                in the specified directory.
+    """
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    best_params_path = os.path.join(output_dir, best_params_file)
+    trials_path = os.path.join(output_dir, trials_file)
+
+    # Save the best parameters in a readable text file (JSON format)
+    with open(best_params_path, 'w') as f:
+        json.dump(study.best_params, f, indent=4)
+
+    # Save the trials data in a CSV file
+    with open(trials_path, 'w', newline='') as csvfile:
+        fieldnames = ['trial_number', 'value', 'params']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+        writer.writeheader()
+        for trial in study.trials:
+            writer.writerow({
+                'trial_number': trial.number,
+                'value': trial.value,
+                'params': trial.params
+            })
+
+
 ########## Procedure ##########
 # Obtain TSP's instances.
 Content_Instances = os.listdir(Path_Instances)
@@ -66,30 +145,13 @@ for file in Content_Instances:
 # corresponding to each one.
 Instances, Opt_Instances = Read_Content(files_Instances, Path_OPT)
 
-# Using best parameters to obtain solutions.
-n = len(Instances)
-results = []
-
-start_time = time.time()
-#for Instance, opt_value in zip(Instances, Opt_Instances):
-# Llamar a GLS (o TabuSearch) utilizando los mejores parámetros cargados.
-#result = genetic_algorithm(Instances[1], len(Instances[1]), pop_size=50, MaxOFcalls=8000)
-result1 = TabuSearch(Instances[1], len(Instances[1]), MaxOFcalls=8000, TabuSize=10,
-               minErrorInten=0.001)
-#print(result)
-print(ObjFun(result1,Instances[1]))       
-# Calcular el valor de la función objetivo para la solución obtenida
-#obj_value = ObjFun(result, Instances[1])
-
-# Calcular el error respecto al valor óptimo
-#error = (obj_value - Opt_Instances[1]) / Opt_Instances[1]
-        
-# Guardar el resultado y el error
-#results.append((obj_value, error))
-
-end_time = time.time()
-        
-# Imprimir el valor de la función objetivo para la solución obtenida.
-#print(f"Objective Value: {obj_value}, Error: {error}")
-execution_time = end_time - start_time
-print(f"Tiempo de ejecución: {execution_time} segundos")
+# Parametrization genetic algorithm.
+study = optuna.create_study(
+    direction='minimize',
+    sampler=optuna.samplers.TPESampler(),  # Using TPE as the sampler
+    pruner=optuna.pruners.MedianPruner()   # Using Median Pruner for early stopping
+)
+study.optimize(Parametrization_GA_capsule(Instances, Opt_Instances), n_trials=1, n_jobs=-1)
+best_params = study.best_params
+print('Best parameters:', best_params)
+save_GA_study_txt(study, output_directory ,best_GA_params_file, trials_GA_file)

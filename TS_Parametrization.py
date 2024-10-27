@@ -63,7 +63,7 @@ def Parametrization_TS(trial, Instances, Opt_Instances):
         every trial.
     """
     # Define parameter intervals using Optuna's suggest methods.
-    MaxOFcalls = trial.suggest_int('MaxOFcalls', 100000, 200000000)  # Control for max calls
+    MaxOFcalls = trial.suggest_int('MaxOFcalls', 100000, 200000)  # Control for max calls
     TabuSize = trial.suggest_int('TabuSize', 10, 750)
     minErrorInten = trial.suggest_float('ErrorTolerance', 1e-5, 1e-1, log=True)
 
@@ -149,7 +149,7 @@ study = optuna.create_study(
     sampler=optuna.samplers.TPESampler(),  # Using TPE as the sampler
     pruner=optuna.pruners.MedianPruner()   # Using Median Pruner for early stopping
 )
-study.optimize(Parametrization_TS_capsule(Instances, Opt_Instances), n_trials=10, n_jobs=-1)
+study.optimize(Parametrization_TS_capsule(Instances, Opt_Instances), n_trials=1, n_jobs=-1)
 best_params = study.best_params
 print('Best parameters:', best_params)
 save_TS_study_txt(study, output_directory ,best_TS_params_file, trials_TS_file)
