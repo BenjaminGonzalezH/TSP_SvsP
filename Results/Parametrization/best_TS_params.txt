@@ -1,5 +1,4 @@
 {
-    "MaxOFcalls": 154645,
-    "TabuSize": 523,
-    "ErrorTolerance": 0.01635371408255039
+    "TabuSize": 657,
+    "ErrorTolerance": 0.0011540483856268204
 }

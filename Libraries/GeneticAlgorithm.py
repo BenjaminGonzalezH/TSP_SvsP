@@ -45,7 +45,7 @@ def Evaluate(population, DistanceMatrix):
     evaluated_population = [(individual, ObjFun(individual, DistanceMatrix)) for individual in population]
     return evaluated_population
 
-def tournament_selection(population, tournament_size=3, num_winners = 5):
+def tournament_selection(population, tournament_size=3, num_winners=5):
     """
     tournament_selection(funcion)
         Input:
@@ -59,32 +59,25 @@ def tournament_selection(population, tournament_size=3, num_winners = 5):
         
         Description: Selection by tournament method.
     """
-    # Winners array and a element to
-    # avoid repeated selections.
     winners = []
     selected_individuals = set()
 
-    # Main Iteration.
     while len(winners) < num_winners:
-        # Select candidates for the tournament.
-        tournament = random.sample([ind for ind in population if tuple(ind[0]) not in selected_individuals], tournament_size)
+        available_population = [ind for ind in population if tuple(ind[0]) not in selected_individuals]
+        
+        # Verify there are enough individuals to hold a tournament
+        if not available_population:
+            break
+        
+        tournament_size = min(tournament_size, len(available_population))
+        tournament = random.sample(available_population, tournament_size)
+        
+        # Check if tournament has candidates to avoid 'NoneType' error
+        if tournament:
+            winner, winner_fitness = min(tournament, key=lambda x: x[1])
+            winners.append((winner, winner_fitness))
+            selected_individuals.add(tuple(winner))
 
-        # Initialize variables for the winner in
-        # this iteration.
-        winner = None
-        winner_fitness = float('inf')
-
-        # compare candidates.
-        for competitor , competitor_fitness in tournament:
-            if competitor_fitness < winner_fitness:
-                winner_fitness = competitor_fitness
-                winner = competitor
-
-        # Add in winners and selected individuals.
-        winners.append((winner,winner_fitness))
-        selected_individuals.add(tuple(winner))
-
-    # Output.
     return winners
 
 def crossover(parent1, parent2):
@@ -148,7 +141,7 @@ def mutation(individual):
     
     return individual
 
-def genetic_algorithm(DistanceMatrix, AmountNodes, pop_size=50, MaxOFcalls=8000):
+def genetic_algorithm(DistanceMatrix, AmountNodes, pop_size=50, MaxOFcalls=8000, T_size=10):
     """
     genetic_algorithm(function)
         Input:
@@ -170,10 +163,8 @@ def genetic_algorithm(DistanceMatrix, AmountNodes, pop_size=50, MaxOFcalls=8000)
     # Main Loop.
     while num_of_calls < MaxOFcalls:
         # Tournament Selection.
-        # Using 2% size of the population and just select the
-        # half of population.
         selected_parents = tournament_selection(evaluated_population,
-                                                tournament_size=2,
+                                                tournament_size=T_size,
                                                 num_winners=(pop_size//2))
         
         # Create descendants.

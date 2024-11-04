@@ -63,8 +63,8 @@ def Parametrization_GA(trial, Instances, Opt_Instances):
         every trial.
     """
     # Define parameter intervals using Optuna's suggest methods.
-    MaxOFcalls = trial.suggest_int('MaxOFcalls', 600, 8000)  # Control for max calls
-    pop_size = trial.suggest_int('POP_SIZE', 10, 750)
+    pop_size = trial.suggest_int('POP_SIZE', 150, 300)
+    T_size = trial.suggest_int('T_SIZE', 5, 10)
 
     # Initialize total normalized error.
     total_normalized_error = 0
@@ -74,7 +74,8 @@ def Parametrization_GA(trial, Instances, Opt_Instances):
         # Run Tabu Search with the parameters from Optuna
         population, _ = genetic_algorithm(Instances[i], len(Instances[i]), 
                                           pop_size,
-                                          MaxOFcalls)
+                                          300000,
+                                          T_size)
 
         # Evaluate the solution quality and calculate normalized error
         nor_error_list = []
@@ -151,7 +152,7 @@ study = optuna.create_study(
     sampler=optuna.samplers.TPESampler(),  # Using TPE as the sampler
     pruner=optuna.pruners.MedianPruner()   # Using Median Pruner for early stopping
 )
-study.optimize(Parametrization_GA_capsule(Instances, Opt_Instances), n_trials=1, n_jobs=-1)
+study.optimize(Parametrization_GA_capsule(Instances, Opt_Instances), n_trials=31, n_jobs=-1)
 best_params = study.best_params
 print('Best parameters:', best_params)
 save_GA_study_txt(study, output_directory ,best_GA_params_file, trials_GA_file)

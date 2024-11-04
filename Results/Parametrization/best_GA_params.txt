@@ -1,4 +1,4 @@
 {
-    "MaxOFcalls": 5698,
-    "POP_SIZE": 174
+    "POP_SIZE": 187,
+    "T_SIZE": 9
 }
