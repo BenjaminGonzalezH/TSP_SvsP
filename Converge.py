@@ -163,8 +163,8 @@ results = []
 
 result = genetic_algorithm_converge(Instances[2], len(Instances[2]), 
                                     pop_size=best_params["POP_SIZE"], 
-                                    MaxOFcalls=500000, 
-                                    T_size=51)
+                                    MaxOFcalls=300000, 
+                                    T_size=best_params["T_SIZE"])
 
 save_all_populations_to_file(result, results_file_path)
 

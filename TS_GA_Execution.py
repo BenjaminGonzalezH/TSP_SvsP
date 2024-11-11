@@ -14,7 +14,7 @@ import json
         the objective function is called.
 """
 Path_Instances = "Instances/Experimental"
-Path_Params = 'Results/Parametrization/best_GA_params.txt'
+Path_Params = 'Results/Parametrization/best_TS_params.txt'
 Path_OPT = "Optimals/Experimental/Optimals.txt"
 output_directory = 'Results/Experimentals'
 
@@ -90,32 +90,32 @@ Instances, Opt_Instances = Read_Content(files_Instances, Path_OPT)
 
 # Params.
 best_params = load_best_params(Path_Params)
-results_file_path = output_directory + '/genetic_algorithm_results_318_4000000.txt'
+results_file_path = output_directory + '/tabu_search_results_318_4000000.txt'
 
 # Using best parameters to obtain solutions.
 n = len(Instances)
 results = []
 #for Instance, opt_value in zip(Instances, Opt_Instances):
 for i in range(11):
-        best_pop, result = genetic_algorithm(Instances[1], len(Instances[1]), 
-                     pop_size=best_params["POP_SIZE"],
+        result = TabuSearch(Instances[1], len(Instances[1]),
                      MaxOFcalls = 4000000,
-                     T_size=best_params["T_SIZE"])
+                     TabuSize=best_params["TabuSize"],
+                     minErrorInten=best_params["ErrorTolerance"])
         
         # Calcular el valor de la función objetivo para la solución obtenida
-        #obj_value = ObjFun(result, Instances[0])
+        obj_value = ObjFun(result, Instances[1])
 
         # Calcular el error respecto al valor óptimo
-        #error = (obj_value - Opt_Instances[0]) / Opt_Instances[0]
-        error = (result[1] - Opt_Instances[1]) / Opt_Instances[1]
+        error = (obj_value - Opt_Instances[1]) / Opt_Instances[1]
+        #error = (result[1] - Opt_Instances[1]) / Opt_Instances[1]
         
         # Guardar el resultado y el error
-        #results.append((obj_value, error))
-        results.append((result[1], error))
+        results.append((obj_value, error))
+        #results.append((result[1], error))
         
         # Imprimir el valor de la función objetivo para la solución obtenida.
-        #print(f"Objective Value: {obj_value}, Error: {error}")
-        print(f"Objective Value: {result[1]}, Error: {error}")
+        print(f"Objective Value: {obj_value}, Error: {error}")
+        #print(f"Objective Value: {result[1]}, Error: {error}")
 
 # Escribir los resultados en un archivo
 write_results(results_file_path, results)
