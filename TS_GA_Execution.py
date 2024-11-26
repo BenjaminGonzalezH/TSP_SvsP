@@ -27,7 +27,9 @@ from ReadTSP import ReadTSP_optTour # type: ignore
 from TabuSearch import ObjFun  # type: ignore
 from TabuSearch import TabuSearch  # type: ignore
 from TabuSearch import TabuSearch_Con  # type: ignore
-from GeneticAlgorithm import genetic_algorithm # type: ignore
+from GeneticAlgorithm_classic import GAc_PMX_swap # type: ignore
+from GeneticAlgorithm_classic import GAc_OX_invertion # type: ignore
+from GeneticAlgorithm_classic import GAc_PBX_scramble # type: ignore
 
 ########## Secundary functions ##########
 
@@ -96,26 +98,25 @@ results_file_path = output_directory + '/tabu_search_results_318_4000000.txt'
 n = len(Instances)
 results = []
 #for Instance, opt_value in zip(Instances, Opt_Instances):
-for i in range(11):
-        result = TabuSearch(Instances[1], len(Instances[1]),
-                     MaxOFcalls = 4000000,
-                     TabuSize=best_params["TabuSize"],
-                     minErrorInten=best_params["ErrorTolerance"])
+for i in range(1):
+        result, _ = GAc_PBX_scramble(80, Instances[0], len(Instances[0]),
+                 80000, 6,
+                 60, 25)
         
         # Calcular el valor de la función objetivo para la solución obtenida
-        obj_value = ObjFun(result, Instances[1])
+        #obj_value = ObjFun(result, Instances[1])
 
         # Calcular el error respecto al valor óptimo
-        error = (obj_value - Opt_Instances[1]) / Opt_Instances[1]
-        #error = (result[1] - Opt_Instances[1]) / Opt_Instances[1]
+        #error = (obj_value - Opt_Instances[1]) / Opt_Instances[1]
+        error = (result[1] - Opt_Instances[0]) / Opt_Instances[0]
         
         # Guardar el resultado y el error
-        results.append((obj_value, error))
-        #results.append((result[1], error))
+        #results.append((obj_value, error))
+        results.append((result[1], error))
         
         # Imprimir el valor de la función objetivo para la solución obtenida.
-        print(f"Objective Value: {obj_value}, Error: {error}")
-        #print(f"Objective Value: {result[1]}, Error: {error}")
+        #print(f"Objective Value: {obj_value}, Error: {error}")
+        print(f"Objective Value: {result[1]}, Error: {error}")
 
 # Escribir los resultados en un archivo
 write_results(results_file_path, results)
