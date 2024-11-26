@@ -27,7 +27,7 @@ from ReadTSP import ReadTSP_optTour # type: ignore
 from TabuSearch import ObjFun  # type: ignore
 from TabuSearch import TabuSearch  # type: ignore
 from TabuSearch import TabuSearch_Con  # type: ignore
-from GeneticAlgorithm import genetic_algorithm # type: ignore
+from GeneticAlgorithmClasssic import GeneticAlgorithm_Classic # type: ignore
 
 ########## Secundary functions ##########
 
@@ -89,25 +89,24 @@ for file in Content_Instances:
 Instances, Opt_Instances = Read_Content(files_Instances, Path_OPT)
 
 # Params.
-best_params = load_best_params(Path_Params)
-results_file_path = output_directory + '/genetic_algorithm_results_318_4000000.txt'
+#best_params = load_best_params(Path_Params)
+#results_file_path = output_directory + '/genetic_algorithm_results_318_4000000.txt'
 
 # Using best parameters to obtain solutions.
 n = len(Instances)
 results = []
 #for Instance, opt_value in zip(Instances, Opt_Instances):
 for i in range(11):
-        best_pop, result = genetic_algorithm(Instances[1], len(Instances[1]), 
-                     pop_size=best_params["POP_SIZE"],
-                     MaxOFcalls = 4000000,
-                     T_size=best_params["T_SIZE"])
+        result, G = GeneticAlgorithm_Classic(100, len(Instances[0]), Instances[0], 
+                             90, 20, 20,
+                             500000, 9)
         
         # Calcular el valor de la función objetivo para la solución obtenida
         #obj_value = ObjFun(result, Instances[0])
 
         # Calcular el error respecto al valor óptimo
         #error = (obj_value - Opt_Instances[0]) / Opt_Instances[0]
-        error = (result[1] - Opt_Instances[1]) / Opt_Instances[1]
+        error = (result[1] - Opt_Instances[0]) / Opt_Instances[0]
         
         # Guardar el resultado y el error
         #results.append((obj_value, error))
@@ -118,4 +117,4 @@ for i in range(11):
         print(f"Objective Value: {result[1]}, Error: {error}")
 
 # Escribir los resultados en un archivo
-write_results(results_file_path, results)
+#write_results(results_file_path, results)
