@@ -64,6 +64,13 @@ def Evaluate(population, DistanceMatrix):
     evaluated_population = [(individual, ObjFun(individual, DistanceMatrix)) for individual in population]
     return evaluated_population
 
+def EvaluateC9(population, DistanceMatrix, pop_size):
+    for i in range(pop_size):
+        for j in range(pop_size):
+            population[i][j] = (population[i][j], ObjFun(population[i][j], DistanceMatrix))
+
+    return population
+
 ########## Selection ##########
 
 def tournament_selection(population, tournament_size=3):
@@ -86,6 +93,27 @@ def tournament_selection(population, tournament_size=3):
     winner, winner_fitness = min(tournament, key=lambda x: x[1])
 
     return (winner, winner_fitness)
+
+def random_selection(population):
+    choice = random.choice(population)
+    return choice
+
+def select_neighbors(population, i, j):
+    neighbors = []
+    filas = len(population)
+    cols = len(population[0])
+    
+    # Direcciones de los vecinos (arriba, abajo, izquierda, derecha, y las diagonales)
+    direcciones = [(-1, 0), (1, 0), (0, -1), (0, 1),  # arriba, abajo, izquierda, derecha
+                   (-1, -1), (-1, 1), (1, -1), (1, 1)]  # diagonales
+    
+    # Comprobamos los vecinos y agregamos los que están dentro de los límites de la matriz
+    for df, dc in direcciones:
+        nuevo_fila, nuevo_col = i + df, j + dc
+        if 0 <= nuevo_fila < filas and 0 <= nuevo_col < cols:
+            neighbors.append(population[nuevo_fila][nuevo_col])
+    
+    return neighbors
 
 ########## Crossover ##########
 
@@ -284,5 +312,30 @@ def reduce_population(population, max_population_size):
 
     return reduced_combined
 
-pop = initialize_population_C9(5, 10)
-print(pop)
+def replace_populationC9(population, child, i, j):
+    filas = len(population)
+    cols = len(population[0])
+    
+    # Direcciones de los vecinos (arriba, abajo, izquierda, derecha, y las diagonales)
+    direcciones = [(-1, 0), (1, 0), (0, -1), (0, 1),  # arriba, abajo, izquierda, derecha
+                   (-1, -1), (-1, 1), (1, -1), (1, 1)]  # diagonales
+    
+    # Comprobamos los vecinos y agregamos los que están dentro de los límites de la matriz
+    for df, dc in direcciones:
+        nuevo_fila, nuevo_col = i + df, j + dc
+        if 0 <= nuevo_fila < filas and 0 <= nuevo_col < cols:
+            if(child[1] <= population[nuevo_fila][nuevo_col][1]):
+                population[nuevo_fila][nuevo_col] = child
+    
+    return population
+
+def obtain_minimal_C9(matriz):
+    minimo = ([], float('inf'))
+    
+    for fila in matriz:
+        for par in fila:
+            segundo_elemento = par[1]
+            if segundo_elemento < minimo[1]:
+                minimo = par
+    
+    return minimo

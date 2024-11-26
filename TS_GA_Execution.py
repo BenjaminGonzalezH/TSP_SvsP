@@ -30,6 +30,9 @@ from TabuSearch import TabuSearch_Con  # type: ignore
 from GeneticAlgorithm_classic import GAc_PMX_swap # type: ignore
 from GeneticAlgorithm_classic import GAc_OX_invertion # type: ignore
 from GeneticAlgorithm_classic import GAc_PBX_scramble # type: ignore
+from GeneticAlgorithm_C9 import GAe_PMX_swap # type: ignore
+from GeneticAlgorithm_C9 import GAe_OX_invertion # type: ignore
+from GeneticAlgorithm_C9 import GAe_PBX_scramble # type: ignore
 
 ########## Secundary functions ##########
 
@@ -92,16 +95,15 @@ Instances, Opt_Instances = Read_Content(files_Instances, Path_OPT)
 
 # Params.
 best_params = load_best_params(Path_Params)
-results_file_path = output_directory + '/tabu_search_results_318_4000000.txt'
+results_file_path = output_directory + '/teeeeee.txt'
 
 # Using best parameters to obtain solutions.
 n = len(Instances)
 results = []
 #for Instance, opt_value in zip(Instances, Opt_Instances):
 for i in range(1):
-        result, _ = GAc_PBX_scramble(80, Instances[0], len(Instances[0]),
-                 80000, 6,
-                 60, 25)
+        _ , result = GAe_PBX_scramble(8, Instances[0], len(Instances[0]),
+                 80000, 60, 25)
         
         # Calcular el valor de la función objetivo para la solución obtenida
         #obj_value = ObjFun(result, Instances[1])

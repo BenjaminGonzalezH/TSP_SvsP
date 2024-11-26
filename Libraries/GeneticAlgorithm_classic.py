@@ -59,7 +59,6 @@ def GAc_PMX_swap(Pop_size, DistanceMatrix, AmountNodes,
 
     return Best, Generations
 
-
 ########## Second one ##########
 
 def GAc_OX_invertion(Pop_size, DistanceMatrix, AmountNodes,
