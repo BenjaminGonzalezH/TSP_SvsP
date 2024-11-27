@@ -1,0 +1,6 @@
+{
+    "POP_SIZE": 26,
+    "T_SIZE": 3,
+    "C_RATE": 80,
+    "M_RATE": 3
+}
