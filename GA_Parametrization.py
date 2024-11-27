@@ -22,15 +22,17 @@ import time
 Path_Instances = "Instances/Parametrizacion"
 Path_OPT = "Optimals/Parametrizacion/Optimals.txt"
 output_directory = 'Results/Parametrization'
-best_GA_params_file = 'best_GA_params.txt'
-trials_GA_file = 'trials_GA.csv'
+best_GA_params_file = 'best_GAc_PBX_scramble_params.txt'
+trials_GA_file = 'trials_GA_PBX_scr.csv'
 
 ########## Own files ##########
 # Path from the workspace.
 sys.path.append(os.path.join(os.path.dirname(__file__), 'Libraries'))
 from ReadTSP import ReadTsp # type: ignore
 from ReadTSP import ReadTSP_optTour # type: ignore
-from GeneticAlgorithm import genetic_algorithm # type: ignore
+from GeneticAlgorithm_classic import GAc_PMX_swap # type: ignore
+from GeneticAlgorithm_classic import GAc_OX_invertion # type: ignore
+from GeneticAlgorithm_classic import GAc_PBX_scramble # type: ignore
 
 ########## Secundary functions ##########
 def Read_Content(filenames_Ins, filenames_Opt):
@@ -63,8 +65,10 @@ def Parametrization_GA(trial, Instances, Opt_Instances):
         every trial.
     """
     # Define parameter intervals using Optuna's suggest methods.
-    pop_size = trial.suggest_int('POP_SIZE', 150, 300)
-    T_size = trial.suggest_int('T_SIZE', 5, 10)
+    pop_size = trial.suggest_int('POP_SIZE', 20, 150)
+    T_size = trial.suggest_int('T_SIZE', 2, 5)
+    crossover_rate = trial.suggest_int('C_RATE', 70, 95)
+    mutation_rate = trial.suggest_int('M_RATE', 1, 5)
 
     # Initialize total normalized error.
     total_normalized_error = 0
@@ -72,14 +76,12 @@ def Parametrization_GA(trial, Instances, Opt_Instances):
 
     for i in range(num_instances):
         # Run Tabu Search with the parameters from Optuna
-        population, _ = genetic_algorithm(Instances[i], len(Instances[i]), 
-                                          pop_size,
-                                          300000,
-                                          T_size)
-
+        _ , population = GAc_PBX_scramble(pop_size, Instances[i], len(Instances[i]),
+                 80000, T_size, crossover_rate, mutation_rate)
+        
         # Evaluate the solution quality and calculate normalized error
         nor_error_list = []
-        for solution in population:
+        for solution in population[-1]:
             normalized_error = abs(solution[1] - Opt_Instances[i]) / Opt_Instances[i]
             nor_error_list.append(normalized_error)
         median_error = np.median(nor_error_list)
@@ -152,7 +154,7 @@ study = optuna.create_study(
     sampler=optuna.samplers.TPESampler(),  # Using TPE as the sampler
     pruner=optuna.pruners.MedianPruner()   # Using Median Pruner for early stopping
 )
-study.optimize(Parametrization_GA_capsule(Instances, Opt_Instances), n_trials=31, n_jobs=-1)
+study.optimize(Parametrization_GA_capsule(Instances, Opt_Instances), n_trials=11, n_jobs=-1)
 best_params = study.best_params
 print('Best parameters:', best_params)
 save_GA_study_txt(study, output_directory ,best_GA_params_file, trials_GA_file)

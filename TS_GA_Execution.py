@@ -14,7 +14,7 @@ import json
         the objective function is called.
 """
 Path_Instances = "Instances/Experimental"
-Path_Params = 'Results/Parametrization/best_GA_params.txt'
+Path_Params = 'Results/Parametrization/best_TS_params.txt'
 Path_OPT = "Optimals/Experimental/Optimals.txt"
 output_directory = 'Results/Experimentals'
 
@@ -27,7 +27,12 @@ from ReadTSP import ReadTSP_optTour # type: ignore
 from TabuSearch import ObjFun  # type: ignore
 from TabuSearch import TabuSearch  # type: ignore
 from TabuSearch import TabuSearch_Con  # type: ignore
-from GeneticAlgorithmClasssic import GeneticAlgorithm_Classic # type: ignore
+from GeneticAlgorithm_classic import GAc_PMX_swap # type: ignore
+from GeneticAlgorithm_classic import GAc_OX_invertion # type: ignore
+from GeneticAlgorithm_classic import GAc_PBX_scramble # type: ignore
+from GeneticAlgorithm_C9 import GAe_PMX_swap # type: ignore
+from GeneticAlgorithm_C9 import GAe_OX_invertion # type: ignore
+from GeneticAlgorithm_C9 import GAe_PBX_scramble # type: ignore
 
 ########## Secundary functions ##########
 
@@ -91,21 +96,24 @@ Instances, Opt_Instances = Read_Content(files_Instances, Path_OPT)
 # Params.
 #best_params = load_best_params(Path_Params)
 #results_file_path = output_directory + '/genetic_algorithm_results_318_4000000.txt'
+best_params = load_best_params(Path_Params)
+results_file_path = output_directory + '/teeeeee.txt'
 
 # Using best parameters to obtain solutions.
 n = len(Instances)
 results = []
 #for Instance, opt_value in zip(Instances, Opt_Instances):
-for i in range(11):
-        result, G = GeneticAlgorithm_Classic(100, len(Instances[0]), Instances[0], 
-                             90, 20, 20,
-                             500000, 9)
+
+for i in range(1):
+        _ , result = GAe_PBX_scramble(8, Instances[0], len(Instances[0]),
+                 80000, 60, 25)
         
         # Calcular el valor de la función objetivo para la solución obtenida
-        #obj_value = ObjFun(result, Instances[0])
+        #obj_value = ObjFun(result, Instances[1])
 
         # Calcular el error respecto al valor óptimo
         #error = (obj_value - Opt_Instances[0]) / Opt_Instances[0]
+        #error = (obj_value - Opt_Instances[1]) / Opt_Instances[1]
         error = (result[1] - Opt_Instances[0]) / Opt_Instances[0]
         
         # Guardar el resultado y el error
