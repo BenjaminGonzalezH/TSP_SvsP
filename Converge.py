@@ -15,7 +15,7 @@ import csv
         the objective function is called.
 """
 Path_Instances = "Instances/Experimental"
-Path_Params = 'Results/Parametrization/best_GA_params.txt'
+Path_Params = 'Results/Parametrization/best_GAc_PBX_scramble_params.txt'
 Path_OPT = "Optimals/Experimental/Optimals.txt"
 output_directory = 'Results/Experimentals'
 
@@ -25,7 +25,13 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'Libraries'))
 from ReadTSP import ReadTsp # type: ignore
 from ReadTSP import ReadTSP_optTour # type: ignore
 from TabuSearch import TabuSearch_Con  # type: ignore
-from GeneticAlgorithm import genetic_algorithm_converge # type: ignore
+from TabuSearch import ObjFun  # type: ignore
+from GeneticAlgorithm_classic import GAc_PMX_swap # type: ignore
+from GeneticAlgorithm_classic import GAc_OX_invertion # type: ignore
+from GeneticAlgorithm_classic import GAc_PBX_scramble # type: ignore
+from GeneticAlgorithm_C9 import GAe_PMX_swap # type: ignore
+from GeneticAlgorithm_C9 import GAe_OX_invertion # type: ignore
+from GeneticAlgorithm_C9 import GAe_PBX_scramble # type: ignore
 
 ########## Secundary functions ##########
 
@@ -116,7 +122,7 @@ def save_results_to_file(population_list, best_solution, filename="results.csv")
     print(f"Resultados guardados en el archivo {filename}")
 
 
-def save_all_populations_to_file(population_list, filename="all_populations.csv"):
+def save_all_populations_to_file(population_list, DistanceMatriz, filename="all_populations.csv"):
     """
     Guarda todas las poblaciones obtenidas en cada iteración del algoritmo genético en un archivo CSV.
     
@@ -124,6 +130,7 @@ def save_all_populations_to_file(population_list, filename="all_populations.csv"
         - population_list: Lista de poblaciones evaluadas en cada iteración.
         - filename: Nombre del archivo donde se guardarán los resultados.
     """
+    # Abrir el archivo en modo escritura
     with open(filename, mode='w', newline='') as file:
         writer = csv.writer(file)
         
@@ -132,8 +139,11 @@ def save_all_populations_to_file(population_list, filename="all_populations.csv"
         
         # Iterar sobre cada iteración y población
         for iteration, population in enumerate(population_list):
-            for individual_idx, (solution, fitness) in enumerate(population):
-                writer.writerow([iteration, fitness, fitness/108159])
+            for individual_idx, solution in enumerate(population):
+                # Asumiendo que el fitness es el segundo valor en la tupla (solución, fitness)
+                error = (((ObjFun(solution, DistanceMatriz))) - 6656) / 6656  # Ajustar el valor de referencia según sea necesario
+                # Escribir la fila correspondiente en el archivo CSV
+                writer.writerow([iteration, individual_idx, ObjFun(solution, DistanceMatriz), error])
     
     print(f"Todas las poblaciones se han guardado en el archivo {filename}")
 ########## Procedure ##########
@@ -151,26 +161,30 @@ Instances, Opt_Instances = Read_Content(files_Instances, Path_OPT)
 
 # Params.
 best_params = load_best_params(Path_Params)
-results_file_path = os.path.join(output_directory, 'GA_converge_194.csv')
+results_file_path = os.path.join(output_directory, 'GAePBXscr_converge_38.csv')
 
 # Using best parameters to obtain solutions.
 n = len(Instances)
 results = []
-"""BestNeOf, BestSolOf = TabuSearch_Con(Instances[2], len(Instances[2]), 
-                    MaxOFcalls=300000,
-                    TabuSize=best_params["TabuSize"],
+"""BestNeOf, BestSolOf = TabuSearch_Con(Instances[0], len(Instances[0]), 
+                    MaxOFcalls=80000,
+                    TabuSize=best_params['TabuSize'],
                     minErrorInten=best_params["ErrorTolerance"])"""
 
-result = genetic_algorithm_converge(Instances[2], len(Instances[2]), 
-                                    pop_size=best_params["POP_SIZE"], 
-                                    MaxOFcalls=300000, 
-                                    T_size=best_params["T_SIZE"])
+rr , result  = GAe_PBX_scramble(best_params['POP_SIZE'], 
+                        Instances[0], 
+                        len(Instances[0]),
+                        80000,
+                        best_params['C_RATE'], 
+                        best_params['M_RATE'])
 
-save_all_populations_to_file(result, results_file_path)
+
+# Guardar todas las poblaciones en el archivo
+save_all_populations_to_file(rr, Instances[0] ,results_file_path)
 
 """for i in range(len(BestNeOf)):
-    BestNeOf[i] = (BestNeOf[i]-Opt_Instances[2])/(Opt_Instances[2])
-    BestSolOf[i] =(BestSolOf[i]-Opt_Instances[2])/(Opt_Instances[2])
+    BestNeOf[i] = (BestNeOf[i]-Opt_Instances[0])/(Opt_Instances[0])
+    BestSolOf[i] =(BestSolOf[i]-Opt_Instances[0])/(Opt_Instances[0])
 
 with open(results_file_path, mode='w', newline='') as csvfile:
     csv_writer = csv.writer(csvfile)

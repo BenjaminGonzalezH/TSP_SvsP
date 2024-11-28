@@ -22,8 +22,8 @@ import time
 Path_Instances = "Instances/Parametrizacion"
 Path_OPT = "Optimals/Parametrizacion/Optimals.txt"
 output_directory = 'Results/Parametrization'
-best_GA_params_file = 'best_GAe_OX_invertion_params.txt'
-trials_GA_file = 'trials_GAe_OX_in.csv'
+best_GA_params_file = 'best_GAe_PBX_scramble_params.txt'
+trials_GA_file = 'trials_GAe_PBX_scr.csv'
 
 ########## Own files ##########
 # Path from the workspace.
@@ -65,7 +65,7 @@ def Parametrization_GA(trial, Instances, Opt_Instances):
         every trial.
     """
     # Define parameter intervals using Optuna's suggest methods.
-    pop_size = trial.suggest_int('POP_SIZE', 20, 150)
+    pop_size = trial.suggest_int('POP_SIZE', 5, 12)
     crossover_rate = trial.suggest_int('C_RATE', 70, 95)
     mutation_rate = trial.suggest_int('M_RATE', 1, 5)
 
@@ -75,11 +75,11 @@ def Parametrization_GA(trial, Instances, Opt_Instances):
 
     for i in range(num_instances):
         # Run Tabu Search with the parameters from Optuna
-        pop , result = GAe_OX_invertion(pop_size, Instances[i], len(Instances[i]),
+        pop , result = GAe_PBX_scramble(pop_size, Instances[i], len(Instances[i]),
                  80000, crossover_rate, mutation_rate)
 
         # Sum the normalized error
-        total_normalized_error += (Opt_Instances[i] - result[1])/Opt_Instances[i]
+        total_normalized_error += (result[1] - Opt_Instances[i])/Opt_Instances[i]
 
     # Return the average normalized error across all instances
     return total_normalized_error / num_instances

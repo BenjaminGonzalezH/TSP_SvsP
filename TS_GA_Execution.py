@@ -14,7 +14,7 @@ import json
         the objective function is called.
 """
 Path_Instances = "Instances/Experimental"
-Path_Params = 'Results/Parametrization/best_TS_params.txt'
+Path_Params = 'Results/Parametrization/best_GAe_PBX_scramble_params.txt'
 Path_OPT = "Optimals/Experimental/Optimals.txt"
 output_directory = 'Results/Experimentals'
 
@@ -97,16 +97,20 @@ Instances, Opt_Instances = Read_Content(files_Instances, Path_OPT)
 #best_params = load_best_params(Path_Params)
 #results_file_path = output_directory + '/genetic_algorithm_results_318_4000000.txt'
 best_params = load_best_params(Path_Params)
-results_file_path = output_directory + '/teeeeee.txt'
+results_file_path = output_directory + '/GAe_PBX_scr_results_76_80000.txt'
 
 # Using best parameters to obtain solutions.
 n = len(Instances)
 results = []
 #for Instance, opt_value in zip(Instances, Opt_Instances):
 
-for i in range(1):
-        _ , result = GAe_PBX_scramble(8, Instances[0], len(Instances[0]),
-                 80000, 60, 25)
+for i in range(11):
+        _, result = GAe_PBX_scramble(best_params['POP_SIZE'], 
+                                      Instances[1], 
+                                      len(Instances[1]),
+                                      80000,
+                                      best_params['C_RATE'], 
+                                      best_params['M_RATE'])
         
         # Calcular el valor de la función objetivo para la solución obtenida
         #obj_value = ObjFun(result, Instances[1])
@@ -114,7 +118,7 @@ for i in range(1):
         # Calcular el error respecto al valor óptimo
         #error = (obj_value - Opt_Instances[0]) / Opt_Instances[0]
         #error = (obj_value - Opt_Instances[1]) / Opt_Instances[1]
-        error = (result[1] - Opt_Instances[0]) / Opt_Instances[0]
+        error = (result[1] - Opt_Instances[1]) / Opt_Instances[1]
         
         # Guardar el resultado y el error
         #results.append((obj_value, error))
@@ -125,4 +129,4 @@ for i in range(1):
         print(f"Objective Value: {result[1]}, Error: {error}")
 
 # Escribir los resultados en un archivo
-#write_results(results_file_path, results)
+write_results(results_file_path, results)

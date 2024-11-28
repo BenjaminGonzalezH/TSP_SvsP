@@ -73,7 +73,7 @@ def Parametrization_TS(trial, Instances, Opt_Instances):
 
     for i in range(num_instances):
         # Run Tabu Search with the parameters from Optuna
-        best_solution = TabuSearch(Instances[i], len(Instances[i]), 300000, 
+        best_solution = TabuSearch(Instances[i], len(Instances[i]), 80000, 
                                    TabuSize, minErrorInten)
 
         # Evaluate the solution quality and calculate normalized error
@@ -149,7 +149,7 @@ study = optuna.create_study(
     sampler=optuna.samplers.TPESampler(),  # Using TPE as the sampler
     pruner=optuna.pruners.MedianPruner()   # Using Median Pruner for early stopping
 )
-study.optimize(Parametrization_TS_capsule(Instances, Opt_Instances), n_trials=31, n_jobs=-1)
+study.optimize(Parametrization_TS_capsule(Instances, Opt_Instances), n_trials=11, n_jobs=-1)
 best_params = study.best_params
 print('Best parameters:', best_params)
 save_TS_study_txt(study, output_directory ,best_TS_params_file, trials_TS_file)

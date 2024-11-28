@@ -1,5 +1,6 @@
 ################ Libraries.
 library(ggplot2)
+library(dplyr)
 
 ################ WorkSpaces.
 setwd("C:/Users/benja/OneDrive/Escritorio/WorkSpace/TSP_SvsP/Results/Experimentals")
@@ -8,20 +9,19 @@ setwd("C:/Users/benja/OneDrive/Escritorio/WorkSpace/TSP_SvsP/Results/Experimenta
 # Convergencia.
 ################
 
-Converge_SA <- read.csv("tabu_search_sample_converge_194.csv")
-Converge_GA <- read.csv("GA_converge_194.csv")
+Converge_SA <- read.csv("TS_converge_38.csv")
+Converge_GA <- read.csv("GAePBXscr_converge_38.csv")
 
 ################
 # Resultados.
 ################
-Caso_GA_1 <- read.csv("genetic_algorithm_results_38_80000.txt")
-Caso_GA_2 <- read.csv("genetic_algorithm_results_76_160000.txt")
-Caso_GA_3 <- read.csv("genetic_algorithm_results_194_2000000.txt")
-Caso_GA_4 <- read.csv("genetic_algorithm_results_318_4000000.txt")
-Caso_TS_1 <- read.csv("tabu_search_results_38_80000.txt")
-Caso_TS_2 <- read.csv("tabu_search_results_76_160000.txt")
-Caso_TS_3 <- read.csv("tabu_search_results_194_2000000.txt")
-Caso_TS_4 <- read.csv("tabu_search_results_318_4000000.txt")
+Caso_GA_1 <- read.csv("")
+Caso_GA_2 <- read.csv("")
+Caso_GA_3 <- read.csv("")
+Caso_TS_1 <- read.csv("TS_results_38_80000.txt")
+Caso_TS_2 <- read.csv("TS_results_76_80000.txt")
+Caso_TS_3 <- read.csv("TS_results_194_80000.txt")
+
 
 ################
 # Gráfico convergencia TS.
@@ -38,61 +38,24 @@ plot(Converge_SA[["Mejor"]], type = "o", col = "blue",
 Converge_GA_list <- split(Converge_GA, Converge_GA$Iteration)
 
 # Elementos a mostrar.
-min_iter_1 <- 0
-max_iter_1 <- 50
-min_iter_2 <- 100
-max_iter_2 <- 150
-min_iter_3 <- 500
-max_iter_3 <- 550
-min_iter_4 <- 3200
-max_iter_4 <- 3250
+inicio <- 1
+fin <- 50
 
-# Filtrar el dataframe Converge_GA para incluir solo el rango de iteraciones deseado
-Converge_GA_filtered_1 <- subset(Converge_GA, Iteration >= min_iter_1 & Iteration <= max_iter_1)
-Converge_GA_filtered_2 <- subset(Converge_GA, Iteration >= min_iter_2 & Iteration <= max_iter_2)
-Converge_GA_filtered_3 <- subset(Converge_GA, Iteration >= min_iter_3 & Iteration <= max_iter_3)
-Converge_GA_filtered_4 <- subset(Converge_GA, Iteration >= min_iter_4 & Iteration <= max_iter_4)
+# Filtrar el dataframe para obtener las iteraciones dentro del rango especificado
+df_filtrado <- Converge_GA %>%
+  filter(Iteration >= inicio & Iteration <= fin) %>%
+  arrange(Iteration)
 
-# Dividir el dataframe filtrado en subconjuntos según la columna 'Iteration'
-Converge_GA_list_1 <- split(Converge_GA_filtered_1, Converge_GA_filtered_1$Iteration)
-Converge_GA_list_2 <- split(Converge_GA_filtered_2, Converge_GA_filtered_2$Iteration)
-Converge_GA_list_3 <- split(Converge_GA_filtered_3, Converge_GA_filtered_3$Iteration)
-Converge_GA_list_4 <- split(Converge_GA_filtered_4, Converge_GA_filtered_4$Iteration)
-
-valores_1 <- unlist(lapply(Converge_GA_list_1, function(df) df[["Error"]]))
-valores_2 <- unlist(lapply(Converge_GA_list_2, function(df) df[["Error"]]))
-valores_3 <- unlist(lapply(Converge_GA_list_3, function(df) df[["Error"]]))
-valores_4 <- unlist(lapply(Converge_GA_list_4, function(df) df[["Error"]]))
-
-etiquetas_iteracion_1 <- rep(names(Converge_GA_list_1), sapply(Converge_GA_list_1, nrow))
-etiquetas_iteracion_2 <- rep(names(Converge_GA_list_2), sapply(Converge_GA_list_2, nrow))
-etiquetas_iteracion_3 <- rep(names(Converge_GA_list_3), sapply(Converge_GA_list_3, nrow))
-etiquetas_iteracion_4 <- rep(names(Converge_GA_list_4), sapply(Converge_GA_list_4, nrow))
-
-# Convergencia.
-boxplot(valores_1 ~ etiquetas_iteracion_1, 
-        xlab = "Iteración", 
-        ylab = "Error", 
-        main = "Convergencia GA - Boxplot por Iteración (0-50)",
-        col = "lightblue")
-
-boxplot(valores_2 ~ etiquetas_iteracion_2, 
-        xlab = "Iteración", 
-        ylab = "Error", 
-        main = "Convergencia GA - Boxplot por Iteración (100-150)",
-        col = "lightblue")
-
-boxplot(valores_3 ~ etiquetas_iteracion_3, 
-        xlab = "Iteración", 
-        ylab = "Error", 
-        main = "Convergencia GA - Boxplot por Iteración (500-550)",
-        col = "lightblue")
-
-boxplot(valores_4 ~ etiquetas_iteracion_4, 
-        xlab = "Iteración", 
-        ylab = "Error", 
-        main = "Convergencia GA - Boxplot por Iteración (3200-3242)",
-        col = "lightblue")
+# Graficar boxplot para 'Error' por cada 'iteration'
+ggplot(df_filtrado, aes(x = factor(Iteration), y = Error)) +
+  geom_boxplot(aes(fill = factor(Iteration)), alpha = 0.7) + 
+  labs(
+    title = "Gráfico de convergencia GA celular PBX-scramble(Shuffle)",
+    x = "Iteración",
+    y = "Error"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
 
 ################
 # Competencia.

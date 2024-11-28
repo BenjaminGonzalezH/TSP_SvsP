@@ -65,7 +65,7 @@ def Parametrization_GA(trial, Instances, Opt_Instances):
         every trial.
     """
     # Define parameter intervals using Optuna's suggest methods.
-    pop_size = trial.suggest_int('POP_SIZE', 20, 150)
+    pop_size = trial.suggest_int('POP_SIZE', 10, 150)
     T_size = trial.suggest_int('T_SIZE', 2, 5)
     crossover_rate = trial.suggest_int('C_RATE', 70, 95)
     mutation_rate = trial.suggest_int('M_RATE', 1, 5)

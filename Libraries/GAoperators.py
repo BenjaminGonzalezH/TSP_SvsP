@@ -44,10 +44,12 @@ def initialize_population(pop_size, AmountNodes):
 
 def initialize_population_C9(pop_size, AmountNodes):
     Population = [[None] * pop_size for _ in range(pop_size)]
+    Population_l = []
     for i in range(pop_size):
         for j in range(pop_size):
             Population[i][j] = first_solution(AmountNodes)
-    return Population
+            Population_l.append(Population[i][j])
+    return Population, Population_l
 
 
 def Evaluate(population, DistanceMatrix):
@@ -315,18 +317,28 @@ def reduce_population(population, max_population_size):
 def replace_populationC9(population, child, i, j):
     filas = len(population)
     cols = len(population[0])
-    
+
     # Direcciones de los vecinos (arriba, abajo, izquierda, derecha, y las diagonales)
     direcciones = [(-1, 0), (1, 0), (0, -1), (0, 1),  # arriba, abajo, izquierda, derecha
                    (-1, -1), (-1, 1), (1, -1), (1, 1)]  # diagonales
+
+    # Conjunto para verificar duplicados de manera eficiente
+    seen = set(tuple(individual[0].tolist()) for row in population for individual in row)
     
+    # Convirtiendo el cromosoma del hijo a tupla solo una vez
+    child_tuple = tuple(child[0].tolist())
+
     # Comprobamos los vecinos y agregamos los que están dentro de los límites de la matriz
     for df, dc in direcciones:
         nuevo_fila, nuevo_col = i + df, j + dc
         if 0 <= nuevo_fila < filas and 0 <= nuevo_col < cols:
-            if(child[1] <= population[nuevo_fila][nuevo_col][1]):
-                population[nuevo_fila][nuevo_col] = child
-    
+            # Si el cromosoma hijo es mejor (menor fitness) que el de la población actual
+            if child[1] <= population[nuevo_fila][nuevo_col][1]:
+                # Solo agregar si el cromosoma del hijo no está ya en 'seen'
+                if child_tuple not in seen:
+                    population[nuevo_fila][nuevo_col] = child
+                    seen.add(child_tuple)  # Añadir el cromosoma al conjunto
+
     return population
 
 def obtain_minimal_C9(matriz):
