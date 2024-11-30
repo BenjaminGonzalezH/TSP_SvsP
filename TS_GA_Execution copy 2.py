@@ -14,7 +14,7 @@ import json
         the objective function is called.
 """
 Path_Instances = "Instances/Experimental"
-Path_Params = 'Results/Parametrization/best_GAe_OX_invertion_params.txt'
+Path_Params = 'Results/Parametrization/best_GAc_OX_invertion_params.txt'
 Path_OPT = "Optimals/Experimental/Optimals.txt"
 output_directory = 'Results/Experimentals'
 
@@ -97,7 +97,7 @@ Instances, Opt_Instances = Read_Content(files_Instances, Path_OPT)
 #best_params = load_best_params(Path_Params)
 #results_file_path = output_directory + '/genetic_algorithm_results_318_4000000.txt'
 best_params = load_best_params(Path_Params)
-results_file_path = output_directory + '/GAe_OX_inv_results_38_80000.txt'
+results_file_path = output_directory + '/GAc_OX_inv_results_194_80000.txt'
 
 # Using best parameters to obtain solutions.
 n = len(Instances)
@@ -105,10 +105,11 @@ results = []
 #for Instance, opt_value in zip(Instances, Opt_Instances):
 
 for i in range(11):
-        _, result = GAe_OX_invertion(best_params['POP_SIZE'], 
-                                      Instances[0], 
-                                      len(Instances[0]),
+        result, _ = GAc_OX_invertion(best_params['POP_SIZE'], 
+                                      Instances[2], 
+                                      len(Instances[2]),
                                       80000,
+                                      best_params['T_SIZE'],
                                       best_params['C_RATE'], 
                                       best_params['M_RATE'])
         
@@ -118,7 +119,7 @@ for i in range(11):
         # Calcular el error respecto al valor óptimo
         #error = (obj_value - Opt_Instances[0]) / Opt_Instances[0]
         #error = (obj_value - Opt_Instances[1]) / Opt_Instances[1]
-        error = (result[1] - Opt_Instances[0]) / Opt_Instances[0]
+        error = (result[1] - Opt_Instances[2]) / Opt_Instances[2]
         
         # Guardar el resultado y el error
         #results.append((obj_value, error))

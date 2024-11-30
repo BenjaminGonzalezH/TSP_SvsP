@@ -10,18 +10,40 @@ setwd("C:/Users/benja/OneDrive/Escritorio/WorkSpace/TSP_SvsP/Results/Experimenta
 ################
 
 Converge_SA <- read.csv("TS_converge_38.csv")
-Converge_GA <- read.csv("GAePBXscr_converge_38.csv")
+Converge_GA <- read.csv("GAcPBXscr_converge_38.csv")
 
 ################
 # Resultados.
 ################
-Caso_GA_1 <- read.csv("")
-Caso_GA_2 <- read.csv("")
-Caso_GA_3 <- read.csv("")
-Caso_TS_1 <- read.csv("TS_results_38_80000.txt")
-Caso_TS_2 <- read.csv("TS_results_76_80000.txt")
-Caso_TS_3 <- read.csv("TS_results_194_80000.txt")
+Caso_GA_1 <- read.csv("GAe_PMX_swp_results_76_80000.txt",header = FALSE)
+Caso_GA_2 <- read.csv("GAe_OX_inv_results_76_80000.txt", header = FALSE)
+Caso_GA_3 <- read.csv("GAe_PBX_scr_results_76_80000.txt", header = FALSE)
+Caso_GA_4 <- read.csv("GAc_PMX_sw_results_76_80000.txt",header = FALSE)
+Caso_GA_5 <- read.csv("GAc_OX_inv_results_76_80000.txt", header = FALSE)
+Caso_GA_6 <- read.csv("GAc_PBX_scr_results_76_80000.txt", header = FALSE)
+Caso_TS_1 <- read.csv("TS_results_76_80000.txt",header = FALSE)
 
+df <- bind_rows(
+  data.frame(Caso = "GAcPMX-swp", Error = Caso_GA_1$V2),
+  data.frame(Caso = "GAcOX-inv", Error = Caso_GA_2$V2),
+  data.frame(Caso = "GAcPBX-scr", Error = Caso_GA_3$V2),
+  data.frame(Caso = "GAePMX-swap", Error = Caso_GA_4$V2),
+  data.frame(Caso = "GAeOX-inv", Error = Caso_GA_5$V2),
+  data.frame(Caso = "GAePBX-scr", Error = Caso_GA_6$V2),
+  data.frame(Caso = "TS", Error = Caso_TS_1$V2)
+)
+
+ggplot(df, aes(x = Caso, y = Error, fill = Caso)) +
+  geom_boxplot(alpha = 0.7) + 
+  labs(
+    title = "Boxplots de Error normalizado qa194 (80.000 llamadas)",
+    x = "Caso",
+    y = "Error"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none", 
+        axis.title.x = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1))
 
 ################
 # Gráfico convergencia TS.
@@ -50,7 +72,7 @@ df_filtrado <- Converge_GA %>%
 ggplot(df_filtrado, aes(x = factor(Iteration), y = Error)) +
   geom_boxplot(aes(fill = factor(Iteration)), alpha = 0.7) + 
   labs(
-    title = "Gráfico de convergencia GA celular PBX-scramble(Shuffle)",
+    title = "Gráfico de convergencia GA clásico PBX-scramble(Shuffle)",
     x = "Iteración",
     y = "Error"
   ) +
@@ -58,70 +80,24 @@ ggplot(df_filtrado, aes(x = factor(Iteration), y = Error)) +
   theme(legend.position = "none")
 
 ################
-# Competencia.
-################
-
-Caso_TS_1$Origen <- "Tabu Search"
-Caso_TS_2$Origen <- "Tabu Search"
-Caso_TS_3$Origen <- "Tabu Search"
-Caso_TS_4$Origen <- "Tabu Search"
-Caso_GA_1$Origen <- "Genetic Algorithm"
-Caso_GA_2$Origen <- "Genetic Algorithm"
-Caso_GA_3$Origen <- "Genetic Algorithm"
-Caso_GA_4$Origen <- "Genetic Algorithm"
-
-# Combinar ambos dataframes
-Caso_combined_1 <- rbind(Caso_TS_1, Caso_GA_1)
-Caso_combined_2 <- rbind(Caso_TS_2, Caso_GA_2)
-Caso_combined_3 <- rbind(Caso_TS_3, Caso_GA_3)
-Caso_combined_4 <- rbind(Caso_TS_4, Caso_GA_4)
-
-# Crear boxplot comparativo
-boxplot(Error ~ Origen, data = Caso_combined_1,
-        xlab = "Algoritmo",
-        ylab = "Error",
-        main = "Comparativo TS-GA (dj38) 80.000 llamadas",
-        col = c("lightblue", "lightgreen"))
-
-boxplot(Error ~ Origen, data = Caso_combined_2,
-        xlab = "Algoritmo",
-        ylab = "Error",
-        main = "Comparativo TS-GA (pr76) 160.000 llamadas",
-        col = c("lightblue", "lightgreen"))
-
-boxplot(Error ~ Origen, data = Caso_combined_3,
-        xlab = "Algoritmo",
-        ylab = "Error",
-        main = "Comparativo TS-GA (qa194) 2.000.000 llamadas",
-        col = c("lightblue", "lightgreen"))
-
-boxplot(Error ~ Origen, data = Caso_combined_4,
-        xlab = "Algoritmo",
-        ylab = "Error",
-        main = "Comparativo TS-GA (lin318) 4.000.000 llamadas",
-        col = c("lightblue", "lightgreen"))
-
-################
 # Prueba Normal.
 ################
 
-resultado_shapiro <- shapiro.test(Caso_GA_1$Error)
+resultado_shapiro <- shapiro.test(Caso_GA_1$V2)
 print(resultado_shapiro)
-resultado_shapiro <- shapiro.test(Caso_GA_2$Error)
+resultado_shapiro <- shapiro.test(Caso_GA_2$V2)
 print(resultado_shapiro)
-resultado_shapiro <- shapiro.test(Caso_GA_3$Error)
+resultado_shapiro <- shapiro.test(Caso_GA_3$V2)
 print(resultado_shapiro)
-resultado_shapiro <- shapiro.test(Caso_GA_4$Error)
+resultado_shapiro <- shapiro.test(Caso_GA_4$V2)
+print(resultado_shapiro)
+resultado_shapiro <- shapiro.test(Caso_GA_5$V2)
+print(resultado_shapiro)
+resultado_shapiro <- shapiro.test(Caso_GA_6$V2)
 print(resultado_shapiro)
 
 
-resultado_shapiro <- shapiro.test(Caso_TS_1$Error)
-print(resultado_shapiro)
-resultado_shapiro <- shapiro.test(Caso_TS_2$Error)
-print(resultado_shapiro)
-resultado_shapiro <- shapiro.test(Caso_TS_3$Error)
-print(resultado_shapiro)
-resultado_shapiro <- shapiro.test(Caso_TS_4$Error)
+resultado_shapiro <- shapiro.test(Caso_TS_1$V2)
 print(resultado_shapiro)
 
 ################

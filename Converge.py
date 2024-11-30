@@ -141,9 +141,9 @@ def save_all_populations_to_file(population_list, DistanceMatriz, filename="all_
         for iteration, population in enumerate(population_list):
             for individual_idx, solution in enumerate(population):
                 # Asumiendo que el fitness es el segundo valor en la tupla (solución, fitness)
-                error = (((ObjFun(solution, DistanceMatriz))) - 6656) / 6656  # Ajustar el valor de referencia según sea necesario
+                error = (((ObjFun(solution[0], DistanceMatriz))) - 6656) / 6656  # Ajustar el valor de referencia según sea necesario
                 # Escribir la fila correspondiente en el archivo CSV
-                writer.writerow([iteration, individual_idx, ObjFun(solution, DistanceMatriz), error])
+                writer.writerow([iteration, individual_idx, ObjFun(solution[0], DistanceMatriz), error])
     
     print(f"Todas las poblaciones se han guardado en el archivo {filename}")
 ########## Procedure ##########
@@ -161,7 +161,7 @@ Instances, Opt_Instances = Read_Content(files_Instances, Path_OPT)
 
 # Params.
 best_params = load_best_params(Path_Params)
-results_file_path = os.path.join(output_directory, 'GAePBXscr_converge_38.csv')
+results_file_path = os.path.join(output_directory, 'GAcPBXscr_converge_38.csv')
 
 # Using best parameters to obtain solutions.
 n = len(Instances)
@@ -171,16 +171,17 @@ results = []
                     TabuSize=best_params['TabuSize'],
                     minErrorInten=best_params["ErrorTolerance"])"""
 
-rr , result  = GAe_PBX_scramble(best_params['POP_SIZE'], 
+rr , result  = GAc_PBX_scramble(best_params['POP_SIZE'], 
                         Instances[0], 
                         len(Instances[0]),
                         80000,
+                        best_params['T_SIZE'],
                         best_params['C_RATE'], 
                         best_params['M_RATE'])
 
 
 # Guardar todas las poblaciones en el archivo
-save_all_populations_to_file(rr, Instances[0] ,results_file_path)
+save_all_populations_to_file(result, Instances[0] ,results_file_path)
 
 """for i in range(len(BestNeOf)):
     BestNeOf[i] = (BestNeOf[i]-Opt_Instances[0])/(Opt_Instances[0])
